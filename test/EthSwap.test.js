@@ -1,6 +1,7 @@
 // testing smart contract using the chai javascript library
 
 const { assert } = require('chai');
+const { default: Web3 } = require('web3');
 
 const Token = artifacts.require('Token');
 const EthSwap = artifacts.require('EthSwap');
@@ -9,6 +10,10 @@ require('chai')
     .use(require('chai-as-promised'))
     .should()
 
+// cam use this to convert regular smart tokens to wei (including the custom tokens we are using)
+function tokens(n){
+    return web3.utils.toWei(n, 'ether');
+}
     
 // Ethswap contract
 contract('EthSwap', (accounts) => {
@@ -16,9 +21,9 @@ contract('EthSwap', (accounts) => {
     // this hok is commonly used to make sure that the prerequisite steps are performed before the rest of the code is executed
     before(async () => {
         token = await Token.new();
-        ethSwap = await EthSwap.new();
+        ethSwap = await EthSwap.new(token.address);
         // Transfer all tokens to Ethswap
-        await token.transfer(ethSwap.address, '1000000000000000000000000')
+        await token.transfer(ethSwap.address, tokens('1000000'))
     })
 
     describe('Token deployment', async () => {
@@ -38,7 +43,13 @@ contract('EthSwap', (accounts) => {
         it('contract has tokens',async () => {
             // duplicate initializing of tokens
             let balance = await token.balanceOf(ethSwap.address)
-            assert.equal(balance.toString(), '1000000000000000000000000')
+            assert.equal(balance.toString(), tokens('1000000'))
+        })
+    })
+
+    describe('buyTokens()', async () => {
+        it('Allows user to instantly purchase tokens from ethSwap foir a fixed price', async () => {
+            ethSwap.buytokens({from: accounts[1], value: tokens('1000000')})
         })
     })
 })
