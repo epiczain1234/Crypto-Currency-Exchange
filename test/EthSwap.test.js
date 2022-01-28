@@ -16,7 +16,7 @@ function tokens(n){
 }
     
 // Ethswap contract
-contract('EthSwap', (accounts) => {
+contract('EthSwap', ([deployer, investor]) => {
     let token, ethSwap;
     // this hok is commonly used to make sure that the prerequisite steps are performed before the rest of the code is executed
     before(async () => {
@@ -49,7 +49,7 @@ contract('EthSwap', (accounts) => {
 
     describe('buyTokens()', async () => {
         it('Allows user to instantly purchase tokens from ethSwap foir a fixed price', async () => {
-            ethSwap.buytokens({from: accounts[1], value: tokens('1000000')})
+            ethSwap.buytokens({from: investor, value: web3.utils.toWei('1', 'ether')})
         })
     })
 })
