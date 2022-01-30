@@ -22,7 +22,7 @@ contract Token {
     );
 
     mapping(address => uint256) public balanceOf;
-    mapping(address => mapping(address => uint256)) public allowance;
+    mapping(address => mapping(address => uint256)) public allowance; // look into
 
     constructor() public {
         balanceOf[msg.sender] = totalSupply;
@@ -32,6 +32,7 @@ contract Token {
         require(balanceOf[msg.sender] >= _value);
         balanceOf[msg.sender] -= _value;
         balanceOf[_to] += _value;
+        // emits job is to trigger the named events which also causes listeners to be called
         emit Transfer(msg.sender, _to, _value);
         return true;
     }
@@ -42,7 +43,7 @@ contract Token {
         emit Approval(msg.sender, _spender, _value);
         return true;
     }
-
+    // exchange function ?
     function transferFrom(address _from, address _to, uint256 _value) public returns (bool success) {
         require(_value <= balanceOf[_from]);
         require(_value <= allowance[_from][msg.sender]);

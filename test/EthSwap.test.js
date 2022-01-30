@@ -39,9 +39,6 @@ contract('EthSwap', ([deployer, investor]) => {
             const name = await ethSwap.name()
             assert.equal(name, "EthSwap Instant Exchange") 
         })
-  
-
-    
         it('contract has tokens',async () => {
             // duplicate initializing of tokens
             let balance = await token.balanceOf(ethSwap.address)
@@ -52,23 +49,29 @@ contract('EthSwap', ([deployer, investor]) => {
     describe('buytokens()', async () => {
         let result
         before(async () => {
-            
             // purchase tokens before each example
             result = await ethSwap.buytokens({from: investor, value:web3.utils.toWei('1','ether')})
         });
 
-            it('Allows user to instantly purchase tokens from ethSap for a fixed price', async() => {
-                // check investor token balance after purchase
-                let investorBalance = await token.balanceOf(investor)
-                assert.equal(investorBalance.toString(), tokens('100'))
-                // check exchange balance after purchase
-                let ethSwapBalance
+        it('Allows user to instantly purchase tokens from ethSap for a fixed price', async() => {
+            // check investor token balance after purchase
+            let investorBalance = await token.balanceOf(investor)
+            assert.equal(investorBalance.toString(), tokens('100'))
+            // check exchange balance after purchase
+            let ethSwapBalance
 
-                ethSwapBalance = await token.balanceOf(ethSwap.address)
-                assert.equal(ethSwapBalance.toString(), tokens('999900'))
-                ethSwapBalance = await web3.eth.getBalance(ethSwap.address)
-                assert.equal(ethSwapBalance.toString(), web3.utils.toWei('1', 'Ether'))
-            })
+            ethSwapBalance = await token.balanceOf(ethSwap.address)
+            assert.equal(ethSwapBalance.toString(), tokens('999900'))
+            ethSwapBalance = await web3.eth.getBalance(ethSwap.address)
+            assert.equal(ethSwapBalance.toString(), web3.utils.toWei('1', 'Ether'))
+
+            // console.log(result.logs)
+            const event = result.logs[0].args
+            assert.equal(event.account, investor)
+            assert.equal(event.token, token.address)
+            assert.equal(event.amount.toString(), tokens('100').toString())
+            assert.equal(event.rate.toString(), '100')
+        })
         })
      
     })
