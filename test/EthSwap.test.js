@@ -39,6 +39,8 @@ contract('EthSwap', ([deployer, investor]) => {
             const name = await ethSwap.name()
             assert.equal(name, "EthSwap Instant Exchange") 
         })
+  
+
     
         it('contract has tokens',async () => {
             // duplicate initializing of tokens
@@ -47,9 +49,26 @@ contract('EthSwap', ([deployer, investor]) => {
         })
     })
 
-    describe('buyTokens()', async () => {
-        it('Allows user to instantly purchase tokens from ethSwap foir a fixed price', async () => {
-            ethSwap.buytokens({from: investor, value: web3.utils.toWei('1', 'ether')})
+    describe('buytokens()', async () => {
+        let result
+        before(async () => {
+            
+            // purchase tokens before each example
+            result = await ethSwap.buytokens({from: investor, value:web3.utils.toWei('1','ether')})
+        });
+
+            it('Allows user to instantly purchase tokens from ethSap for a fixed price', async() => {
+                // check investor token balance after purchase
+                let investorBalance = await token.balanceOf(investor)
+                assert.equal(investorBalance.toString(), tokens('100'))
+                // check exchange balance after purchase
+                let ethSwapBalance
+
+                ethSwapBalance = await token.balanceOf(ethSwap.address)
+                assert.equal(ethSwapBalance.toString(), tokens('999900'))
+                ethSwapBalance = await web3.eth.getBalance(ethSwap.address)
+                assert.equal(ethSwapBalance.toString(), web3.utils.toWei('1', 'Ether'))
+            })
         })
+     
     })
-})
